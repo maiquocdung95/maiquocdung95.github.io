@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📊 Portfolio Dashboard — Dũng</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1119;
+    --card: #1a1d2e;
+    --border: #2a2d3e;
+    --text: #e2e8f0;
+    --dim: #8892b0;
+    --green: #22c55e;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --gold: #f59e0b;
+    --purple: #a855f7;
+    --orange: #f97316;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container { max-width: 1400px; margin:0 auto; }
+
+  /* HEADER */
+  header {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 18px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 { font-size: 1.5rem; font-weight: 600; }
+  header .badge {
+    background: var(--green); color: #000;
+    padding: 3px 12px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 700;
+  }
+  header .sub { color: var(--dim); font-size: 0.82rem; }
+
+  /* CARDS */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px; margin-bottom: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px;
+  }
+  .card .label { color: var(--dim); font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card .value { font-size: 1.55rem; font-weight: 700; margin-top: 4px; }
+  .card .meta { color: var(--dim); font-size: 0.72rem; margin-top: 4px; }
+  .card .change { font-size: 0.78rem; font-weight: 600; margin-top: 2px; }
+  .green { color: var(--green); }
+  .red   { color: var(--red); }
+  .blue  { color: var(--blue); }
+  .gold  { color: var(--gold); }
+  .orange { color: var(--orange); }
+
+  /* 2-COLUMN LAYOUT */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 14px; margin-bottom: 16px;
+  }
+  @media (max-width: 1000px) { .main-grid { grid-template-columns: 1fr; } }
+
+  /* TABLE */
+  .section-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px;
+  }
+  .section-box h3 { font-size: 0.82rem; color: var(--dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th, td { padding: 8px 6px; text-align: right; border-bottom: 1px solid var(--border); }
+  th { color: var(--dim); font-weight: 500; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.3px; }
+  th:first-child, td:first-child { text-align: left; font-weight: 600; }
+  td.green { color: var(--green); }
+  td.red   { color: var(--red); }
+  tr.total { font-weight: 700; border-top: 2px solid var(--border); }
+  tr.total td { border-bottom: none; padding-top: 10px; }
+
+  /* CHARTS */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px; margin-bottom: 16px;
+  }
+  @media (max-width: 1000px) { .charts-row { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 650px) { .charts-row { grid-template-columns: 1fr; } }
+  .chart-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px;
+  }
+  .chart-box h3 { font-size: 0.80rem; color: var(--dim); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  canvas { width: 100% !important; max-height: 250px; }
+
+  /* MARKET SNAPSHOT */
+  .snap-row {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;
+  }
+  .snap-tag {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 10px;
+    font-size: 0.76rem; white-space: nowrap;
+  }
+  .snap-tag .val { font-weight: 600; margin-left: 4px; }
+
+  /* FOOTER */
+  footer {
+    margin-top: 16px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+    text-align: center; color: var(--dim); font-size: 0.70rem;
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* HOLDINGS EXTRA */
+  .holding-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.82rem;
+  }
+  .holding-row:last-child { border-bottom: none; }
+  .holding-row .sym { font-weight: 700; min-width: 40px; }
+  .holding-row .qty { color: var(--dim); font-size: 0.74rem; margin: 0 6px; }
+  .holding-row .pl { font-weight: 600; margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <h1>📊 Portfolio Dashboard</h1>
+    <span class="badge">Đang nắm 4 mã</span>
+    <span class="sub">| Cập nhật: 26/06/2026</span>
+    <span class="sub">| VNINDEX: <b style="color:var(--green)">1,871.91</b></span>
+  </header>
+
+  <!-- OVERVIEW CARDS -->
+  <div class="cards">
+    <div class="card">
+      <div class="label">💰 Vốn đầu tư</div>
+      <div class="value gold">145.1 tr</div>
+      <div class="meta">6 lệnh, 4 mã</div>
+    </div>
+    <div class="card">
+      <div class="label">📈 Giá trị hiện tại</div>
+      <div class="value">149.8 tr</div>
+      <div class="change green">+4.74 tr (+3.27%)</div>
+    </div>
+    <div class="card">
+      <div class="label">🏦 Ngân hàng (69%)</div>
+      <div class="value green">+8.35 tr</div>
+      <div class="meta">MBB + VPB — +8.78%</div>
+    </div>
+    <div class="card">
+      <div class="label">📉 SSI</div>
+      <div class="value red">-3.48 tr</div>
+      <div class="meta">-18.01% — nặng nhất DM</div>
+    </div>
+    <div class="card">
+      <div class="label">🏭 HPG</div>
+      <div class="value red">-0.13 tr</div>
+      <div class="meta">-0.42% — gần hòa vốn</div>
+    </div>
+  </div>
+
+  <!-- MAIN: TABLE + HOLDINGS DETAIL -->
+  <div class="main-grid">
+    <div class="section-box">
+      <h3>📋 Danh mục chi tiết</h3>
+      <table>
+        <thead>
+          <tr><th>Mã</th><th>KL</th><th>Giá vốn</th><th>Giá HT</th><th>Giá trị vốn</th><th>Giá trị HT</th><th>Lãi/Lỗ</th><th>%</th><th>%DM</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>MBB</b></td><td>3,314</td><td>22.40</td><td>24,750</td>
+            <td>74.2tr</td><td>82.0tr</td>
+            <td class="green">+7.79tr</td><td class="green">+10.5%</td><td>54.8%</td>
+          </tr>
+          <tr>
+            <td><b>VPB</b></td><td>800</td><td>26.05</td><td>26,750</td>
+            <td>20.8tr</td><td>21.4tr</td>
+            <td class="green">+0.56tr</td><td class="green">+2.7%</td><td>14.3%</td>
+          </tr>
+          <tr>
+            <td><b>SSI</b></td><td>600</td><td>32.20</td><td>26,400</td>
+            <td>19.3tr</td><td>15.8tr</td>
+            <td class="red">-3.48tr</td><td class="red">-18.0%</td><td>10.6%</td>
+          </tr>
+          <tr>
+            <td><b>HPG</b></td><td>1,300</td><td>23.60</td><td>23,500</td>
+            <td>30.7tr</td><td>30.6tr</td>
+            <td class="red">-0.13tr</td><td class="red">-0.4%</td><td>20.4%</td>
+          </tr>
+          <tr class="total">
+            <td><b>Tổng</b></td><td>—</td><td>—</td><td>—</td>
+            <td><b>145.1tr</b></td><td><b>149.8tr</b></td>
+            <td class="green"><b>+4.74tr</b></td><td class="green"><b>+3.27%</b></td><td>100%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-box">
+      <h3>📌 Chi tiết từng lệnh</h3>
+      <div class="holding-row"><span class="sym">MBB</span><span class="qty">1,214 × 15.53</span><span>30/05/2025</span><span class="pl green">+11,195đ</span></div>
+      <div class="holding-row"><span class="sym">MBB</span><span class="qty">1,500 × 26.50</span><span>15/04/2026</span><span class="pl red">-1,750đ</span></div>
+      <div class="holding-row"><span class="sym">MBB</span><span class="qty">600 × 26.05</span><span>06/05/2026</span><span class="pl red">-1,300đ</span></div>
+      <div class="holding-row"><span class="sym">SSI</span><span class="qty">600 × 32.20</span><span>06/03/2026</span><span class="pl red">-5,800đ</span><span style="font-size:0.7rem;color:var(--red);margin-left:4px;">⚠️ Sụp hầm</span></div>
+      <div class="holding-row"><span class="sym">VPB</span><span class="qty">800 × 26.05</span><span>10/06/2026</span><span class="pl green">+700đ</span></div>
+      <div class="holding-row"><span class="sym">HPG</span><span class="qty">1,300 × 23.60</span><span>10/06/2026</span><span class="pl red">-100đ</span></div>
+
+      <h3 style="margin-top:16px;">⚠️ Bài học</h3>
+      <div style="font-size:0.78rem; color:var(--dim); background:var(--bg); padding:8px 10px; border-radius:8px; border-left:3px solid var(--red);">
+        <b>SSI 06/03/2026:</b> Cần xem xét kỹ thị trường, đặt stop loss trước nếu mua theo xu hướng.
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="charts-row">
+    <div class="chart-box">
+      <h3>🥧 Phân bổ ngành</h3>
+      <canvas id="chartSector"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>📈 VNINDEX 4 tuần gần nhất</h3>
+      <canvas id="chartVNINDEX"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>📊 Lãi/Lỗ từng mã (nghìn đồng)</h3>
+      <canvas id="chartPL"></canvas>
+    </div>
+  </div>
+
+  <!-- MARKET SNAPSHOT -->
+  <div class="section-box">
+    <h3>🌐 Thị trường hôm nay (26/06/2026)</h3>
+    <div class="snap-row">
+      <span class="snap-tag">🏛 VNINDEX <span class="val" style="color:var(--green)">1,871.91</span> <span style="color:var(--green);font-size:0.7rem;">+2.60%</span></span>
+      <span class="snap-tag">💵 USD/VND <span class="val">26,084 / 26,454</span></span>
+      <span class="snap-tag">🏦 MBB <span class="val" style="color:var(--red)">24,750</span> <span style="color:var(--red);font-size:0.7rem;">-1.00%</span></span>
+      <span class="snap-tag">📊 SSI <span class="val" style="color:var(--red)">26,400</span> <span style="color:var(--red);font-size:0.7rem;">-2.76%</span></span>
+      <span class="snap-tag">🏦 VPB <span class="val" style="color:var(--green)">26,750</span> <span style="color:var(--green);font-size:0.7rem;">+3.28%</span></span>
+      <span class="snap-tag">🏭 HPG <span class="val" style="color:var(--red)">23,500</span> <span style="color:var(--red);font-size:0.7rem;">-0.42%</span></span>
+    </div>
+    <div style="margin-top:8px; font-size:0.74rem; color:var(--dim);">
+      ⚠️ <b>Post-Mortem W25:</b> Danh mục 100% cổ phiếu trong kịch bản VÙNG TRŨNG (khuyến nghị 30-45%) — độ lệch +55-70% so với kế hoạch.
+      <span style="margin-left:10px;">🔥 FTSE nâng hạng VN lên Secondary EM — hiệu lực 21/09/2026.</span>
+      <span style="margin-left:10px;">⏰ MSCI Annual Review 24/06 — đã công bố.</span>
+    </div>
+  </div>
+
+  <footer>
+    📊 Portfolio Dashboard • Dữ liệu từ vnstock MCP Server • Cập nhật 26/06/2026 •
+    <a href="#" onclick="alert('Báo cáo W25: VÙNG TRŨNG (nghiêng RÚT CỦI) — tỷ trọng 30-45%')">📄 Xem báo cáo W25</a>
+  </footer>
+</div>
+
+<script>
+// ===== CHART 1: SECTOR PIE =====
+new Chart(document.getElementById('chartSector'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Ngân hàng (MBB+VPB)', 'Thép (HPG)', 'Chứng khoán (SSI)'],
+    datasets: [{
+      data: [103.42, 30.55, 15.84],
+      backgroundColor: ['#3b82f6', '#f59e0b', '#a855f7'],
+      borderColor: '#1a1d2e',
+      borderWidth: 3,
+      hoverBorderColor: '#e2e8f0'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    cutout: '60%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#8892b0', padding: 12, usePointStyle: true, pointStyleWidth: 10, font: { size: 11 } }
+      },
+      tooltip: {
+        callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed.toFixed(1) + ' tr (' + ['69.0%','20.4%','10.6%'][ctx.dataIndex] + ')' }
+      }
+    }
+  }
+});
+
+// ===== CHART 2: VNINDEX LINE (W22-W25) =====
+new Chart(document.getElementById('chartVNINDEX'), {
+  type: 'line',
+  data: {
+    labels: ['W22','W23','W24','W25 (26/06)'],
+    datasets: [{
+      label: 'VNINDEX',
+      data: [1822.10, 1791.65, 1824.53, 1871.91],
+      borderColor: '#22c55e',
+      backgroundColor: 'rgba(34, 197, 94, 0.08)',
+      borderWidth: 2.5,
+      pointRadius: 6,
+      pointBackgroundColor: ['#f59e0b','#ef4444','#3b82f6','#22c55e'],
+      pointBorderColor: '#1a1d2e',
+      pointBorderWidth: 2,
+      tension: 0.4,
+      fill: true
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => 'VNINDEX: ' + ctx.parsed.y.toLocaleString('vi-VN') } }
+    },
+    scales: {
+      x: { ticks: { color: '#8892b0' }, grid: { color: '#2a2d3e' } },
+      y: { ticks: { color: '#8892b0' }, grid: { color: '#2a2d3e' }, min: 1750, max: 1900 }
+    }
+  }
+});
+
+// ===== CHART 3: P/L BAR =====
+new Chart(document.getElementById('chartPL'), {
+  type: 'bar',
+  data: {
+    labels: ['MBB', 'VPB', 'SSI', 'HPG'],
+    datasets: [{
+      data: [7788.5, 560, -3480, -130],
+      backgroundColor: ['#22c55e', '#22c55e', '#ef4444', '#ef4444'],
+      borderRadius: 8,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => (ctx.parsed.y >= 0 ? '+' : '') + ctx.parsed.y.toLocaleString('vi-VN') + ' nghìn đồng' } }
+    },
+    scales: {
+      x: { ticks: { color: '#8892b0', font: { weight: 'bold' } }, grid: { display: false } },
+      y: { ticks: { color: '#8892b0', callback: v => (v/1000).toFixed(1) + 'tr' }, grid: { color: '#2a2d3e' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
