@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💬 Chat với Blog</title>
+<style>
+  :root { --bg: #0f1119; --card: #1a1d2e; --border: #2a2d3e; --text: #e2e8f0; --dim: #8892b0; --blue: #3b82f6; --green: #22c55e; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Segoe UI', system-ui, sans-serif; min-height:100vh; }
+  .pw-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:9999; }
+  .pw-box { background:var(--card); padding:30px; border-radius:14px; text-align:center; border:1px solid var(--border); }
+  .pw-box h3 { color:var(--text); margin-bottom:16px; }
+  .pw-box input { padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); width:220px; margin-right:8px; font-size:16px; }
+  .pw-box button { padding:10px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; cursor:pointer; font-size:16px; }
+  .pw-box .err { color:#ef4444; display:none; margin-top:12px; }
+  .chat-container { max-width:800px; margin:0 auto; padding:20px; display:none; }
+  header { display:flex; align-items:center; gap:10px; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+  header h1 { font-size:1.3rem; font-weight:600; }
+  header .badge { background:var(--green); color:#000; padding:2px 10px; border-radius:999px; font-size:0.72rem; font-weight:700; }
+  .messages { height:55vh; overflow-y:auto; margin-bottom:16px; padding:10px; border:1px solid var(--border); border-radius:12px; background:var(--card); }
+  .msg { margin-bottom:12px; padding:10px 14px; border-radius:10px; max-width:85%; line-height:1.5; font-size:0.92rem; }
+  .msg.user { background:var(--blue); color:#fff; margin-left:auto; border-bottom-right-radius:4px; }
+  .msg.ai { background:var(--bg); color:var(--text); border:1px solid var(--border); border-bottom-left-radius:4px; }
+  .msg .ref { font-size:0.72rem; color:var(--dim); margin-top:6px; }
+  .input-row { display:flex; gap:8px; }
+  .input-row input { flex:1; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:0.92rem; }
+  .input-row input:focus { outline:none; border-color:var(--blue); }
+  .input-row button { padding:10px 20px; border-radius:8px; background:var(--blue); color:#fff; border:none; cursor:pointer; font-weight:600; }
+  .input-row button:disabled { opacity:0.5; }
+  .loader { display:inline-block; width:14px; height:14px; border:2px solid var(--dim); border-top-color:var(--blue); border-radius:50%; animation:spin .6s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  footer { text-align:center; color:var(--dim); font-size:0.72rem; margin-top:12px; }
+</style>
+</head>
+<body>
+
+<div id="pw-gate" class="pw-overlay">
+  <div class="pw-box">
+    <h3>🔐 Trang riêng tư</h3>
+    <input type="password" id="pw-input" placeholder="Nhập mật khẩu..." onkeydown="if(event.key==='Enter') checkPw()">
+    <button onclick="checkPw()">Mở</button>
+    <p class="err" id="pw-error">❌ Sai mật khẩu</p>
+  </div>
+</div>
+
+<div id="chat-container" class="chat-container">
+  <header>
+    <h1>💬 Chat với Blog</h1>
+    <span class="badge">AI</span>
+  </header>
+  <div id="messages" class="messages">
+    <div class="msg ai">👋 Chào bạn! Tôi có thể trả lời câu hỏi về nội dung blog này. Bạn muốn hỏi gì?</div>
+  </div>
+  <div class="input-row">
+    <input type="text" id="question" placeholder="Nhập câu hỏi về đầu tư, tài chính..." onkeydown="if(event.key==='Enter') ask()">
+    <button id="send-btn" onclick="ask()">Gửi</button>
+  </div>
+  <footer>🤖 Trả lời bởi AI • Nội dung dựa trên blog</footer>
+</div>
+
+<script>
+const PASSWORD = '110502';
+const API_KEY = 'sk-bbfc1d0a02264f08a3a0662068843f25';
+const MODEL = 'deepseek-chat';
+let context = [];
+
+function checkPw() {
+  if (document.getElementById('pw-input').value === PASSWORD) {
+    document.getElementById('pw-gate').style.display = 'none';
+    document.getElementById('chat-container').style.display = 'block';
+    loadContext();
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+  }
+}
+
+async function loadContext() {
+  try {
+    const res = await fetch('/static/chat-context.json');
+    context = await res.json();
+  } catch(e) {
+    addMsg('⚠️ Không thể tải nội dung blog. Vui lòng thử lại sau.', 'ai');
+  }
+}
+
+function addMsg(text, role, refs) {
+  const el = document.createElement('div');
+  el.className = 'msg ' + role;
+  el.innerHTML = text;
+  if (refs) {
+    const r = document.createElement('div');
+    r.className = 'ref';
+    r.textContent = '📄 ' + refs.join(', ');
+    el.appendChild(r);
+  }
+  document.getElementById('messages').appendChild(el);
+  el.scrollIntoView({ behavior: 'smooth' });
+}
+
+function findRelevant(query) {
+  const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+  const scored = context.map(page => {
+    const text = (page.title + ' ' + page.body).toLowerCase();
+    let score = words.filter(w => text.includes(w)).length;
+    if (page.title.toLowerCase().includes(query.toLowerCase())) score += 3;
+    return { ...page, score };
+  });
+  return scored.filter(p => p.score > 0).sort((a,b) => b.score - a.score).slice(0, 5);
+}
+
+async function ask() {
+  const input = document.getElementById('question');
+  const btn = document.getElementById('send-btn');
+  const q = input.value.trim();
+  if (!q) return;
+
+  addMsg(q, 'user');
+  input.value = '';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loader"></span>';
+
+  const relevant = findRelevant(q);
+  let system = 'Bạn là trợ lý AI của blog "Quốc Dũng\'s Garden". Trả lời dựa trên nội dung blog. Nếu không tìm thấy, nói "Tôi không tìm thấy thông tin này trong blog." Trả lời tiếng Việt, ngắn gọn.';
+  if (relevant.length > 0) {
+    const ctx = relevant.map(p => '---\nBài: ' + p.title + '\n' + p.body.substring(0,1500) + '\n---').join('\n\n');
+    system += '\n\nNội dung tham khảo:\n' + ctx;
+  }
+
+  try {
+    const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
+      body: JSON.stringify({ model: MODEL, messages: [{ role: 'system', content: system }, { role: 'user', content: q }], max_tokens: 1000, temperature: 0.7 })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const answer = data.choices[0].message.content;
+    addMsg(answer.replace(/\n/g, '<br>'), 'ai', relevant.map(p => p.title.substring(0,40)));
+  } catch(e) {
+    addMsg('❌ Lỗi: ' + e.message, 'ai');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Gửi';
+}
+</script>
+</body>
+</html>
