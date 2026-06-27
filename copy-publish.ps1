@@ -52,7 +52,9 @@ foreach ($line in $includes) {
         $destDir = Join-Path $CONTENT $line
         New-Item -ItemType Directory -Force -Path $destDir | Out-Null
         Get-ChildItem -Path $src -File -Recurse | ForEach-Object {
-            $relative = $_.FullName.Substring($src.Length + 1)
+            $srcFull = [System.IO.Path]::GetFullPath($src).TrimEnd('\')
+            $fileFull = [System.IO.Path]::GetFullPath($_.FullName)
+            $relative = $fileFull.Substring($srcFull.Length + 1)
             $fullRel  = "$line\$relative"
             $destFile = Join-Path $destDir $relative
             $destParent = Split-Path $destFile -Parent
