@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 Hành trình 10 tỷ — Dũng & Vợ</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1119;
+    --card: #1a1d2e;
+    --border: #2a2d3e;
+    --text: #e2e8f0;
+    --dim: #8892b0;
+    --green: #22c55e;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --gold: #f59e0b;
+    --purple: #a855f7;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container { max-width: 1400px; margin:0 auto; }
+  header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 { font-size: 1.6rem; font-weight: 600; }
+  header .sub { color: var(--dim); font-size: 0.85rem; }
+  .badge {
+    background: var(--green); color: #000;
+    padding: 2px 10px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 700;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin-bottom: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 18px;
+  }
+  .card .label { color: var(--dim); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card .value { font-size: 1.7rem; font-weight: 700; margin-top: 4px; }
+  .card .meta { color: var(--dim); font-size: 0.72rem; margin-top: 4px; }
+  .green { color: var(--green); }
+  .red { color: var(--red); }
+  .blue { color: var(--blue); }
+  .gold { color: var(--gold); }
+
+  .cashflow-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 18px;
+    margin-bottom: 20px;
+  }
+  .cashflow-section h3 { font-size: 0.88rem; color: var(--dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cf-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+  }
+  .cf-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .cf-box h4 { font-size: 0.76rem; color: var(--purple); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cf-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 0; font-size: 0.83rem;
+  }
+  .cf-row .cf-label { color: var(--dim); flex: 1; }
+  .cf-row .cf-val { font-weight: 600; margin-left: 8px; }
+  .cf-row input {
+    width: 72px; background: var(--card); border: 1px solid var(--border);
+    color: var(--text); padding: 3px 6px; border-radius: 6px;
+    font-size: 0.83rem; text-align: right; font-family: inherit;
+  }
+  .cf-row input:focus { outline: none; border-color: var(--blue); }
+  .cf-row select {
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--text); padding: 3px 6px; border-radius: 6px;
+    font-size: 0.83rem; font-family: inherit;
+  }
+  .cf-result {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .cf-result h4 { font-size: 0.76rem; color: var(--green); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cf-result .big-number { font-size: 1.5rem; font-weight: 700; }
+
+  .charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-bottom: 20px;
+  }
+  @media (max-width: 900px) { .charts { grid-template-columns: 1fr; } }
+  .chart-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px;
+  }
+  .chart-box h3 { font-size: 0.85rem; color: var(--dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  canvas { width: 100% !important; max-height: 300px; }
+
+  .timeline {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px 18px;
+  }
+  .timeline h3 { font-size: 0.85rem; color: var(--dim); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tl-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .tl-row:last-child { border-bottom: none; }
+  .tl-year { font-weight: 700; font-size: 0.9rem; min-width: 45px; color: var(--gold); }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .tl-dot.done { background: var(--green); }
+  .tl-dot.active { background: var(--blue); }
+  .tl-dot.future { background: var(--border); }
+  .tl-text { flex:1; font-size: 0.84rem; }
+  .tl-amount { font-weight: 600; font-size: 0.85rem; }
+
+  footer {
+    margin-top: 20px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+    text-align: center; color: var(--dim); font-size: 0.72rem;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <h1>🎯 Hành trình 10 tỷ</h1>
+    <span class="badge">Dũng & Vợ</span>
+    <span class="sub">| Tỷ giá: <span id="hdrRate">163</span> VND/JPY</span>
+  </header>
+
+  <!-- CARDS -->
+  <div class="cards">
+    <div class="card">
+      <div class="label">💰 Vốn đầu tư hiện tại</div>
+      <div class="value gold">260 tr</div>
+      <div class="meta">Chứng khoán VN</div>
+    </div>
+    <div class="card">
+      <div class="label">🎯 Mục tiêu 2036</div>
+      <div class="value">10 tỷ</div>
+      <div class="meta">~10,945 tr nếu 11.8%/năm</div>
+    </div>
+    <div class="card">
+      <div class="label">📈 Tiến độ</div>
+      <div class="value blue">2.6%</div>
+      <div class="meta">Còn 10.5 năm — dài hạn</div>
+    </div>
+    <div class="card">
+      <div class="label">⚡ Lãi suất cần thiết</div>
+      <div class="value green">11.8%/năm</div>
+      <div class="meta">Trong TK lịch sử VNINDEX</div>
+    </div>
+    <div class="card">
+      <div class="label">💵 Quỹ khẩn cấp</div>
+      <div class="value">60 man</div>
+      <div class="meta">~98 tr — không đụng</div>
+    </div>
+  </div>
+
+  <!-- THU CHI HÀNG THÁNG (điều chỉnh được) -->
+  <div class="cashflow-section">
+    <h3>💵 Thu Chi Hàng Tháng — điều chỉnh để sát thực tế</h3>
+    <div class="cf-grid">
+      <div class="cf-box">
+        <h4>📥 Thu nhập (man/tháng)</h4>
+        <div class="cf-row">
+          <span class="cf-label">Dũng: Lương CB + Tăng ca (GROSS)</span>
+          <input type="number" id="dungGross" value="50" step="1" min="0" onchange="recalc()">
+        </div>
+        <div class="cf-row">
+          <span class="cf-label">Dũng: NET (sau thuế + nhà)</span>
+          <span class="cf-val blue" id="dungNet">36.0 man</span>
+        </div>
+        <div class="cf-row">
+          <span class="cf-label">Vợ: Baito hiện tại</span>
+          <input type="number" id="voBaito" value="9" step="1" min="0" onchange="recalc()">
+        </div>
+        <div class="cf-row">
+          <span class="cf-label">Vợ: Chính thức (dự kiến)</span>
+          <input type="number" id="voCT" value="20" step="1" min="0" onchange="recalc()">
+        </div>
+        <div class="cf-row" style="border-top:1px solid var(--border); margin-top:5px; padding-top:7px;">
+          <span class="cf-label"><b>Tổng NET (baito)</b></span>
+          <span class="cf-val green" id="totalIncome">73.3 tr</span>
+        </div>
+      </div>
+
+      <div class="cf-box">
+        <h4>📤 Chi tiêu (man/tháng)</h4>
+        <div class="cf-row">
+          <span class="cf-label">Chi tiêu 2 vợ chồng</span>
+          <input type="number" id="chiTieu2" value="12" step="0.5" min="0" onchange="recalc()">
+        </div>
+        <div class="cf-row">
+          <span class="cf-label">Chi phí em bé (dự kiến)</span>
+          <input type="number" id="chiEmBe" value="5" step="0.5" min="0" onchange="recalc()">
+        </div>
+        <div class="cf-row">
+          <span class="cf-label">Giai đoạn hiện tại</span>
+          <select id="phase" onchange="recalc()">
+            <option value="noBaby">Chưa có con</option>
+            <option value="withBaby">Có con, vợ baito</option>
+            <option value="nghi">Có con, vợ nghỉ sinh</option>
+          </select>
+        </div>
+        <div class="cf-row" style="border-top:1px solid var(--border); margin-top:5px; padding-top:7px;">
+          <span class="cf-label"><b>Tổng chi</b></span>
+          <span class="cf-val red" id="totalExpense">19.6 tr</span>
+        </div>
+      </div>
+
+      <div class="cf-box">
+        <h4>📋 Chi phí khác / năm</h4>
+        <div class="cf-row">
+          <span class="cf-label">Vé máy bay VN (2 vé)</span>
+          <input type="number" id="veMB" value="35" step="5" min="0" onchange="recalc()">
+        </div>
+        <div class="cf-row">
+          <span class="cf-label">Chi phí khác</span>
+          <input type="number" id="chiKhacNam" value="0" step="5" min="0" onchange="recalc()">
+        </div>
+        <div class="cf-row">
+          <span class="cf-label">Tỷ giá JPY/VND</span>
+          <input type="number" id="tyGia" value="163" step="1" onchange="recalc()">
+        </div>
+      </div>
+
+      <div class="cf-result">
+        <h4>💰 Kết quả</h4>
+        <div class="cf-row">
+          <span class="cf-label">Tiền dư / tháng</span>
+          <span class="big-number green" id="surplusMonth">53.8 tr</span>
+        </div>
+        <div class="cf-row">
+          <span class="cf-label">Tiền dư / năm</span>
+          <span class="big-number gold" id="surplusYear">610 tr</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts">
+    <div class="chart-box">
+      <h3>📈 Mô phỏng lãi kép 11.8%/năm (2026–2036)</h3>
+      <canvas id="chartFv"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>📅 Tiết kiệm hàng năm (triệu VND)</h3>
+      <canvas id="chartCashflow"></canvas>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline">
+    <h3>🗺 Lộ trình cột mốc</h3>
+    <div class="tl-row"><span class="tl-year">2026</span><span class="tl-dot done"></span><span class="tl-text">Bắt đầu theo dõi. Vợ baito, chưa con.</span><span class="tl-amount">580 tr</span></div>
+    <div class="tl-row"><span class="tl-year">2027</span><span class="tl-dot active"></span><span class="tl-text">👶 Em bé chào đời. Vợ nghỉ dưỡng thai + sinh (1.5 năm)</span><span class="tl-amount">1,025 tr</span></div>
+    <div class="tl-row"><span class="tl-year">2028</span><span class="tl-dot active"></span><span class="tl-text">6T đầu nghỉ, 6T sau baito trở lại</span><span class="tl-amount">1,620 tr</span></div>
+    <div class="tl-row"><span class="tl-year">2029</span><span class="tl-dot future"></span><span class="tl-text">Vợ baito ổn định, có con. TK 513 tr/năm</span><span class="tl-amount">2,383 tr</span></div>
+    <div class="tl-row"><span class="tl-year">2030</span><span class="tl-dot future"></span><span class="tl-text">Cột mốc 3 tỷ — năm thứ 5</span><span class="tl-amount">3,237 tr</span></div>
+    <div class="tl-row"><span class="tl-year">2033</span><span class="tl-dot future"></span><span class="tl-text">Cột mốc 5 tỷ — nửa đường</span><span class="tl-amount">6,449 tr</span></div>
+    <div class="tl-row"><span class="tl-year">2036</span><span class="tl-dot future"></span><span class="tl-text">🏆 ĐÍCH — 10 tỷ!</span><span class="tl-amount green">10,945 tr ✅</span></div>
+  </div>
+
+  <footer>Dashboard tự động từ dữ liệu phân tích • Cập nhật thủ công cuối mỗi tháng</footer>
+</div>
+
+<script>
+// ===== THU CHI CALCULATOR =====
+function recalc() {
+  const tyGia = parseFloat(document.getElementById('tyGia').value) || 163;
+  const dungGross = parseFloat(document.getElementById('dungGross').value) || 50;
+  const dungNetMan = Math.round(dungGross * 0.72 * 100) / 100; // ~28% thuế + nhà
+  const voBaito = parseFloat(document.getElementById('voBaito').value) || 9;
+  const voCT = parseFloat(document.getElementById('voCT').value) || 20;
+  const chiTieu2 = parseFloat(document.getElementById('chiTieu2').value) || 12;
+  const chiEmBe = parseFloat(document.getElementById('chiEmBe').value) || 5;
+  const veMB = parseFloat(document.getElementById('veMB').value) || 35;
+  const chiKhacNam = parseFloat(document.getElementById('chiKhacNam').value) || 0;
+  const phase = document.getElementById('phase').value;
+
+  document.getElementById('dungNet').textContent = dungNetMan.toFixed(1) + ' man';
+  document.getElementById('hdrRate').textContent = tyGia;
+
+  const dungNetVND = dungNetMan * 10000 * tyGia / 1_000_000;
+  const voBaitoVND = voBaito * 10000 * tyGia / 1_000_000;
+
+  let totalIncomeVND, totalExpenseVND;
+  if (phase === 'noBaby') {
+    totalIncomeVND = dungNetVND + voBaitoVND;
+    totalExpenseVND = chiTieu2 * 10000 * tyGia / 1_000_000;
+  } else if (phase === 'nghi') {
+    totalIncomeVND = dungNetVND; // chỉ Dũng
+    totalExpenseVND = (chiTieu2 + chiEmBe) * 10000 * tyGia / 1_000_000;
+  } else {
+    totalIncomeVND = dungNetVND + voBaitoVND;
+    totalExpenseVND = (chiTieu2 + chiEmBe) * 10000 * tyGia / 1_000_000;
+  }
+
+  const surplusMonth = totalIncomeVND - totalExpenseVND;
+  const surplusYear = surplusMonth * 12 - veMB - chiKhacNam;
+
+  document.getElementById('totalIncome').textContent = totalIncomeVND.toFixed(1) + ' tr';
+  document.getElementById('totalExpense').textContent = totalExpenseVND.toFixed(1) + ' tr';
+  document.getElementById('surplusMonth').textContent = surplusMonth.toFixed(1) + ' tr';
+  document.getElementById('surplusYear').textContent = surplusYear.toFixed(0) + ' tr';
+}
+recalc();
+
+// ===== BIỂU ĐỒ =====
+const years = ['2026','2027','2028','2029','2030','2031','2032','2033','2034','2035','2036'];
+const fvData  = [580, 1025, 1620, 2383, 3237, 4191, 5257, 6449, 7781, 9270, 10945];
+const targetLine = [580, 1025, 1620, 2500, 3500, 4500, 5500, 6500, 7500, 8800, 10000];
+const cashflow = [288, 337, 425, 513, 513, 513, 513, 513, 513, 513, 513];
+
+new Chart(document.getElementById('chartFv'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: 'FV với 11.8%/năm',
+        data: fvData,
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34, 197, 94, 0.08)',
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointBackgroundColor: '#22c55e',
+        tension: 0.35,
+        fill: true
+      },
+      {
+        label: 'Mục tiêu 10 tỷ (tuyến tính)',
+        data: targetLine,
+        borderColor: '#f59e0b',
+        borderDash: [6, 3],
+        borderWidth: 1.5,
+        pointRadius: 3,
+        pointBackgroundColor: '#f59e0b',
+        tension: 0.35,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { labels: { color: '#8892b0', usePointStyle: true, padding: 20 } },
+      tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toLocaleString('vi-VN') + ' triệu' } }
+    },
+    scales: {
+      x: { ticks: { color: '#8892b0' }, grid: { color: '#2a2d3e' } },
+      y: { ticks: { color: '#8892b0', callback: v => (v/1000).toFixed(1) + ' tỷ' }, grid: { color: '#2a2d3e' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('chartCashflow'), {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [{
+      label: 'Tiết kiệm (triệu VND)',
+      data: cashflow,
+      backgroundColor: ['#22c55e','#f59e0b','#f59e0b','#3b82f6','#3b82f6','#3b82f6','#3b82f6','#3b82f6','#3b82f6','#3b82f6','#3b82f6'],
+      borderRadius: 8,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.parsed.y.toLocaleString('vi-VN') + ' triệu' } } },
+    scales: {
+      x: { ticks: { color: '#8892b0' }, grid: { display: false } },
+      y: { ticks: { color: '#8892b0', callback: v => v + ' tr' }, grid: { color: '#2a2d3e' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
