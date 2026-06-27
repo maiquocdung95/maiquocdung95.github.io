@@ -8,16 +8,28 @@ import * as Plugin from "./quartz/plugins"
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "Quartz 4",
+    pageTitle: "Quốc Dũng's Garden",
     pageTitleSuffix: "",
     enableSPA: true,
     enablePopovers: true,
-    analytics: {
-      provider: "plausible",
-    },
-    locale: "en-US",
-    baseUrl: "quartz.jzhao.xyz",
-    ignorePatterns: ["private", "templates", ".obsidian"],
+    analytics: null,
+    locale: "vi-VN",
+    baseUrl: "maiquocdung95.github.io",
+    ignorePatterns: [
+      "private",
+      "templates",
+      ".obsidian",
+      ".git",
+      "copilot",
+      "logs",
+      "node_modules",
+      ".gitattributes",
+      ".gitignore",
+      "package.json",
+      "package-lock.json",
+      ".OBSIDIANTEST",
+      "*.skill",
+    ],
     defaultDateType: "modified",
     theme: {
       fontOrigin: "googleFonts",
@@ -66,7 +78,7 @@ const config: QuartzConfig = {
         },
         keepBackground: false,
       }),
-      Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: false }),
+      Plugin.ObsidianFlavoredMarkdown({ enableInHtmlEmbed: true }),
       Plugin.GitHubFlavoredMarkdown(),
       Plugin.TableOfContents(),
       Plugin.CrawlLinks({ markdownLinkResolution: "shortest" }),
@@ -88,7 +100,6 @@ const config: QuartzConfig = {
       Plugin.Static(),
       Plugin.Favicon(),
       Plugin.NotFoundPage(),
-      // Comment out CustomOgImages to speed up build time
       Plugin.CustomOgImages(),
     ],
   },
