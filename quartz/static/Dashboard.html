@@ -183,7 +183,7 @@
     <div class="card">
       <div class="label">🎯 Mục tiêu 2036</div>
       <div class="value">10 tỷ</div>
-      <div class="meta">~10,945 tr nếu 11.8%/năm</div>
+      <div class="meta">~10,945 tr nếu 14.6%/năm</div>
     </div>
     <div class="card">
       <div class="label">📈 Tiến độ</div>
@@ -192,7 +192,7 @@
     </div>
     <div class="card">
       <div class="label">⚡ Lãi suất cần thiết</div>
-      <div class="value green">11.8%/năm</div>
+      <div class="value green">14.6%/năm</div>
       <div class="meta">Trong TK lịch sử VNINDEX</div>
     </div>
     <div class="card">
@@ -278,8 +278,8 @@
       <div class="cf-box">
         <h4>📋 Chi phí khác / năm</h4>
         <div class="cf-row">
-          <span class="cf-label">Vé máy bay VN (2 vé)</span>
-          <input type="number" id="veMB" value="35" step="5" min="0" onchange="recalc()">
+          <span class="cf-label">Chi phí về nước</span>
+          <input type="number" id="veMB" value="100" step="5" min="0" onchange="recalc()">
         </div>
         <div class="cf-row">
           <span class="cf-label">Chi phí khác</span>
@@ -308,7 +308,7 @@
   <!-- CHARTS -->
   <div class="charts">
     <div class="chart-box">
-      <h3>📈 Mô phỏng lãi kép 11.8%/năm (2026–2036)</h3>
+      <h3>📈 Mô phỏng lãi kép 14.6%/năm (2026–2036)</h3>
       <canvas id="chartFv"></canvas>
     </div>
     <div class="chart-box">
@@ -329,7 +329,7 @@
     <div class="tl-row"><span class="tl-year">2036</span><span class="tl-dot future"></span><span class="tl-text">🏆 ĐÍCH — 10 tỷ!</span><span class="tl-amount green">10,945 tr ✅</span></div>
   </div>
 
-  <footer>Dashboard tự động từ dữ liệu phân tích • Cập nhật thủ công cuối mỗi tháng</footer>
+  <footer>Dashboard tự động từ dữ liệu phân tích • Cập nhật: 27/06/2026</footer>
 </div>
 
 <script>
@@ -376,9 +376,9 @@ recalc();
 
 // ===== BIỂU ĐỒ =====
 const years = ['2026','2027','2028','2029','2030','2031','2032','2033','2034','2035','2036'];
-const fvData  = [580, 1025, 1620, 2383, 3237, 4191, 5257, 6449, 7781, 9270, 10945];
-const targetLine = [580, 1025, 1620, 2500, 3500, 4500, 5500, 6500, 7500, 8800, 10000];
-const cashflow = [288, 337, 425, 513, 513, 513, 513, 513, 513, 513, 513];
+const fvData  = [500, 845, 1329, 1970, 2704, 3546, 4511, 5617, 6884, 8336, 10000];
+const targetLine = [500, 845, 1500, 2500, 3500, 4500, 5500, 6500, 7500, 8800, 10000];
+const cashflow = [222, 272, 360, 447, 447, 447, 447, 447, 447, 447, 447];
 
 new Chart(document.getElementById('chartFv'), {
   type: 'line',
@@ -386,7 +386,7 @@ new Chart(document.getElementById('chartFv'), {
     labels: years,
     datasets: [
       {
-        label: 'FV với 11.8%/năm',
+        label: 'FV với 14.6%/năm',
         data: fvData,
         borderColor: '#22c55e',
         backgroundColor: 'rgba(34, 197, 94, 0.08)',
@@ -453,7 +453,6 @@ new Chart(document.getElementById('chartCashflow'), {
   } catch(e) { console.error('PortPL err:', e); }
 
 </script>
-
 </div>
 <script>
 function checkPw() {
@@ -468,6 +467,5 @@ document.getElementById('pw-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') checkPw();
 });
 </script>
-
 </body>
 </html>
