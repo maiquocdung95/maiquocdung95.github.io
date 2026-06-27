@@ -56,6 +56,21 @@
   .red { color: var(--red); }
   .blue { color: var(--blue); }
   .gold { color: var(--gold); }
+  .port-sect{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:20px}
+  .port-sect h3{font-size:0.88rem;color:var(--dim);margin-bottom:12px;text-transform:uppercase}
+  .port-sect h4{font-size:0.80rem;color:var(--gold);margin:12px 0 8px}
+  .port-tbl{width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:8px}
+  .port-tbl th,.port-tbl td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--border)}
+  .port-tbl th{color:var(--dim);font-weight:500;font-size:0.72rem;text-transform:uppercase}
+  .port-tbl th:first-child,.port-tbl td:first-child{text-align:left}
+  .port-tbl tr.tot{font-weight:700;border-top:2px solid var(--border)}
+  .port-tbl tr.tot td{border-bottom:none;padding-top:10px}
+  .s-tag{background:var(--bg);padding:2px 8px;border-radius:4px;font-weight:700;font-size:0.80rem}
+  .pholder{background:var(--bg);border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;color:var(--dim);font-size:0.82rem}
+  .prow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+  .pbox{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px}
+  .pbox h5{font-size:0.74rem;color:var(--dim);margin-bottom:6px;text-transform:uppercase}
+
 
   .cashflow-section {
     background: var(--card);
@@ -174,6 +189,27 @@
       <div class="label">💵 Quỹ khẩn cấp</div>
       <div class="value">60 man</div>
       <div class="meta">~98 tr — không đụng</div>
+    </div>
+  </div>
+
+  <div class='port-sect'>
+    <h3>Danh muc Dau tu</h3>
+    <h4>Dung -- Von: 145.1 tr | Gia tri HT: 149.8 tr</h4>
+    <table class='port-tbl'>
+      <thead><tr><th>Ma</th><th>KL</th><th>Gia von</th><th>Gia HT</th><th>Gia tri HT</th><th>Lai/Lo</th><th>%</th><th>%DM</th></tr></thead>
+      <tbody>
+        <tr><td><span class='s-tag' style='color:var(--blue)'>MBB</span></td><td>3,314</td><td>22.40</td><td>24,750</td><td>82.0 tr</td><td class='green'>+7.79 tr</td><td class='green'>+10.5%</td><td>54.8%</td></tr>
+        <tr><td><span class='s-tag' style='color:var(--gold)'>VPB</span></td><td>800</td><td>26.05</td><td>26,750</td><td>21.4 tr</td><td class='green'>+0.56 tr</td><td class='green'>+2.7%</td><td>14.3%</td></tr>
+        <tr><td><span class='s-tag' style='color:var(--purple)'>SSI</span></td><td>600</td><td>32.20</td><td>26,400</td><td>15.8 tr</td><td class='red'>-3.48 tr</td><td class='red'>-18.0%</td><td>10.6%</td></tr>
+        <tr><td><span class='s-tag' style='color:var(--orange)'>HPG</span></td><td>1,300</td><td>23.60</td><td>23,500</td><td>30.6 tr</td><td class='red'>-0.13 tr</td><td class='red'>-0.4%</td><td>20.4%</td></tr>
+        <tr class='tot'><td><b>Tong</b></td><td>--</td><td>--</td><td>--</td><td><b>149.8 tr</b></td><td class='green'><b>+4.74 tr</b></td><td class='green'><b>+3.3%</b></td><td>100%</td></tr>
+      </tbody>
+    </table>
+    <h4>Vo -- Se bo sung sau</h4>
+    <div class='pholder'>Danh muc cua Vo chua duoc nhap.<br>Von du kien: ~115 tr | Se cap nhat khi co du lieu.</div>
+    <div class='prow'>
+      <div class='pbox'><h5>Phan bo nganh (Dung)</h5><canvas id='chartPortSector' style='max-height:200px'></canvas></div>
+      <div class='pbox'><h5>Lai/Lo tung ma (nghin dong)</h5><canvas id='chartPortPL' style='max-height:200px'></canvas></div>
     </div>
   </div>
 
@@ -399,6 +435,13 @@ new Chart(document.getElementById('chartCashflow'), {
     }
   }
 });
+  try {
+    new Chart(document.getElementById('chartPortSector'),{type:'doughnut',data:{labels:['Ngan hang','Thep (HPG)','Chung khoan (SSI)'],datasets:[{data:[103.42,30.55,15.84],backgroundColor:['#3b82f6','#f59e0b','#a855f7'],borderColor:'#1a1d2e',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:true,cutout:0.55,plugins:{legend:{position:'bottom',labels:{color:'#8892b0',padding:8,usePointStyle:true,font:{size:10}}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.parsed.toFixed(1)+' tr';}}}}}});
+  } catch(e) { console.error('PortSector err:', e); }
+  try {
+    new Chart(document.getElementById('chartPortPL'),{type:'bar',data:{labels:['MBB','VPB','SSI','HPG'],datasets:[{data:[7788.5,560,-3480,-130],backgroundColor:['#22c55e','#22c55e','#ef4444','#ef4444'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8892b0',font:{weight:'bold'}},grid:{display:false}},y:{ticks:{color:'#8892b0',callback:function(v){return (v/1000).toFixed(1)+'tr';}},grid:{color:'#2a2d3e'}}}}});
+  } catch(e) { console.error('PortPL err:', e); }
+
 </script>
 </body>
 </html>
