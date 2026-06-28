@@ -177,8 +177,8 @@
   <div class="cards">
     <div class="card">
       <div class="label">💰 Vốn đầu tư hiện tại</div>
-      <div class="value gold">260 tr</div>
-      <div class="meta">Chứng khoán VN</div>
+      <div class="value gold">254 tr</div>
+      <div class="meta">Dũng+Vợ: 250 tr HT</div>
     </div>
     <div class="card">
       <div class="label">🎯 Mục tiêu 2036</div>
@@ -187,7 +187,7 @@
     </div>
     <div class="card">
       <div class="label">📈 Tiến độ</div>
-      <div class="value blue">2.6%</div>
+      <div class="value blue">2.5%</div>
       <div class="meta">Còn 10.5 năm — dài hạn</div>
     </div>
     <div class="card">
@@ -215,8 +215,18 @@
         <tr class='tot'><td><b>Tong</b></td><td>--</td><td>--</td><td>--</td><td><b>149.8 tr</b></td><td class='green'><b>+4.74 tr</b></td><td class='green'><b>+3.3%</b></td><td>100%</td></tr>
       </tbody>
     </table>
-    <h4>Vo -- Se bo sung sau</h4>
-    <div class='pholder'>Danh muc cua Vo chua duoc nhap.<br>Von du kien: ~115 tr | Se cap nhat khi co du lieu.</div>
+    <h4>Vợ -- Vốn: 108.4 tr | GT HT: 100.3 tr</h4>
+    <table class='port-tbl'>
+      <thead><tr><th>Mã</th><th>KL</th><th>Giá mua</th><th>Giá HT</th><th>GT HT</th><th>Lãi/Lỗ</th><th>%</th></tr></thead>
+      <tbody>
+        <tr><td><span class='s-tag' style='color:var(--orange)'>BSR</span></td><td>470</td><td>27.15</td><td>24,250</td><td>11.4 tr</td><td class='red'>-1.36 tr</td><td class='red'>-10.7%</td></tr>
+        <tr><td><span class='s-tag' style='color:var(--gold)'>VIX</span></td><td>700</td><td>18.51</td><td>16,850</td><td>11.8 tr</td><td class='red'>-1.16 tr</td><td class='red'>-9.0%</td></tr>
+        <tr><td><span class='s-tag' style='color:var(--purple)'>SSI</span></td><td>1,500</td><td>28.44</td><td>26,400</td><td>39.6 tr</td><td class='red'>-3.06 tr</td><td class='red'>-7.2%</td></tr>
+        <tr><td><span class='s-tag' style='color:var(--blue)'>MBB</span></td><td>938</td><td>26.32</td><td>24,750</td><td>23.2 tr</td><td class='red'>-1.47 tr</td><td class='red'>-6.0%</td></tr>
+        <tr><td><span class='s-tag' style='color:var(--green)'>PVS</span></td><td>380</td><td>40.30</td><td>37,500</td><td>14.3 tr</td><td class='red'>-1.06 tr</td><td class='red'>-6.9%</td></tr>
+        <tr class='tot'><td><b>Tổng</b></td><td><b>3,988</b></td><td>--</td><td>--</td><td><b>100.3 tr</b></td><td class='red'><b>-8.12 tr</b></td><td class='red'><b>-7.5%</b></td></tr>
+      </tbody>
+    </table>
     <div class='prow'>
       <div class='pbox'><h5>Phan bo nganh (Dung)</h5><canvas id='chartPortSector' style='max-height:200px'></canvas></div>
       <div class='pbox'><h5>Lai/Lo tung ma (nghin dong)</h5><canvas id='chartPortPL' style='max-height:200px'></canvas></div>
@@ -329,7 +339,7 @@
     <div class="tl-row"><span class="tl-year">2036</span><span class="tl-dot future"></span><span class="tl-text">🏆 ĐÍCH — 10 tỷ!</span><span class="tl-amount green">10,945 tr ✅</span></div>
   </div>
 
-  <footer>Dashboard tự động từ dữ liệu phân tích • Cập nhật: 27/06/2026</footer>
+  <footer>Dashboard tự động từ dữ liệu phân tích • Cập nhật: 28/06/2026</footer>
 </div>
 
 <script>
@@ -446,10 +456,10 @@ new Chart(document.getElementById('chartCashflow'), {
   }
 });
   try {
-    new Chart(document.getElementById('chartPortSector'),{type:'doughnut',data:{labels:['Ngan hang','Thep (HPG)','Chung khoan (SSI)'],datasets:[{data:[103.42,30.55,15.84],backgroundColor:['#3b82f6','#f59e0b','#a855f7'],borderColor:'#1a1d2e',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:true,cutout:0.55,plugins:{legend:{position:'bottom',labels:{color:'#8892b0',padding:8,usePointStyle:true,font:{size:10}}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.parsed.toFixed(1)+' tr';}}}}}});
+    new Chart(document.getElementById('chartPortSector'),{type:'doughnut',data:{labels:['Ngân hàng','Thép','CK','Dầu khí'],datasets:[{data:[126.6,30.6,67.2,25.7],backgroundColor:['#3b82f6','#f59e0b','#a855f7','#f97316'],borderColor:'#1a1d2e',borderWidth:3}]},options:{responsive:true,maintainAspectRatio:true,cutout:0.55,plugins:{legend:{position:'bottom',labels:{color:'#8892b0',padding:8,usePointStyle:true,font:{size:10}}},tooltip:{callbacks:{label:function(c){return c.label+': '+c.parsed.toFixed(1)+' tr';}}}}}});
   } catch(e) { console.error('PortSector err:', e); }
   try {
-    new Chart(document.getElementById('chartPortPL'),{type:'bar',data:{labels:['MBB','VPB','SSI','HPG'],datasets:[{data:[7788.5,560,-3480,-130],backgroundColor:['#22c55e','#22c55e','#ef4444','#ef4444'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8892b0',font:{weight:'bold'}},grid:{display:false}},y:{ticks:{color:'#8892b0',callback:function(v){return (v/1000).toFixed(1)+'tr';}},grid:{color:'#2a2d3e'}}}}});
+    new Chart(document.getElementById('chartPortPL'),{type:'bar',data:{labels:['MBB','VPB','SSI','HPG','BSR','VIX','PVS'],datasets:[{data:[6320,560,-6540,-130,-1360,-1160,-1060],backgroundColor:['#22c55e','#22c55e','#ef4444','#ef4444','#ef4444','#ef4444','#ef4444'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#8892b0',font:{weight:'bold'}},grid:{display:false}},y:{ticks:{color:'#8892b0',callback:function(v){return (v/1000).toFixed(1)+'tr';}},grid:{color:'#2a2d3e'}}}}});
   } catch(e) { console.error('PortPL err:', e); }
 
 </script>
